@@ -1,11 +1,13 @@
-# Texas
+# TEXAS
+
+### This crate used to be Texas with a capital T. An issue was raised, and thus I have 'renamed' it the only way I know how. Apologies for any inconvenience.
 
 ## Purpose
 
 This crate does not, in any way, even remotely cover the vast variety of things you can do with latex. Instead, it attempts to provide a friendly API
 for some of the most basic functions. Furthermore, it does not catch most latex errors.
 
-It's also my first foray into the open-source world, so constructive criticism is welcome and appreciated. https://github.com/Abhay478/Texas/issues
+It's also my first foray into the open-source world, so constructive criticism is welcome and appreciated. https://github.com/Abhay478/texas/issues
 
 
 
