@@ -1,6 +1,6 @@
 # TEXAS
 
-### This crate used to be Texas with a capital T. An issue was raised, and thus I have 'renamed' it the only way I know how. Apologies for any inconvenience.
+### This crate used to be Texas with a capital T. An issue was raised, and thus I have 'renamed' it the only way I know how. Apologies for any inconvenience. It is now `rust-texas`.
 
 ## Purpose
 

@@ -1,13 +1,13 @@
 [package]
 name = "rust-texas"
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 description = "Crate to generate latex documents"
 license = "MIT"
 keywords = ["latex", "tex", "pdf", "generation"]
 readme = "README.md"
 repository = "https://github.com/Abhay478/texas" # yeehaw
-# documentation = "https://docs.rs/texas/0.2.3"
+documentation = "https://docs.rs/rust-texas/0.2.5"
 author = "Abhay Shankar K"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
