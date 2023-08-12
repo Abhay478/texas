@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "texas"
+name = "rust-texas"
 version = "0.2.4"
