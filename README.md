@@ -48,20 +48,10 @@ doc.new_package(package!("parskip", "parfill"));
 - Also has trait `Opt`, which allows for adding options to a command (like `usepackage` and `documentclass`, for now).
 
 ## Log 
-- ### 0.1.7
-  - `package!` macro wasn't working, fixed that.
-  - Moved the modules to the front (re-exported them in `lib.rs`) for convenience.
-- ### 0.1.8
-  - Small whoops. Latex errors due to `Line` code.
-- ### 0.1.9
-  - Brought structs into scope. 
-- ### 0.2.1
-  - Documentation is a thing now.
-- ### 0.2.2
-  - Images and tables.
-  - Fixed a few documentation hiccups.
-  - Fixed another problem with the `package!` macro. Wasn't really crippling to begin with.
 - ### 0.2.3
   - Lil cleanup
   - Finally added the ensuremath stuff. Adding a bunch more.
-
+- ### 0.2.[45]
+  - Nothing, really. Renamed the crate. Big whoop.
+- 0.2.6
+  - Added a few Debug/Clone derives.

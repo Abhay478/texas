@@ -6,6 +6,7 @@ use crate::*;
 /// There is also nothing preventing you from putting a \part{} in a document of class "part",
 /// but latex will show an error. If you want those restrictions to be implemented, please put
 /// up an issue
+#[derive(Debug, Clone)]
 pub enum DocumentClassType {
     Article,
     Part,
@@ -43,6 +44,7 @@ impl From<&str> for DocumentClassType {
 /// Wrapper around `DocumentClassType`, contains whatever options you want to add.
 /// Nothing prevents you from adding absolute gibberish as an option. If you want those
 /// restrictions implemented, please put up an issue.
+#[derive(Debug, Clone)]
 pub struct DocumentClass {
     typ: DocumentClassType,
     opt: Vec<String>,
@@ -73,6 +75,7 @@ impl Opt for DocumentClass {
 
 /// This here is the main reason I made this crate - other crates don't let you add options
 /// to packages. Has macro support, to please use it :).
+#[derive(Debug, Clone)]
 pub struct Package {
     name: String,
     opt: Vec<String>,
@@ -102,6 +105,7 @@ impl Package {
 }
 
 /// Title and author, if y'all want more, please put up an issue.
+#[derive(Debug, Clone)]
 pub struct Metadata {
     title: String,
     author: String,
@@ -138,6 +142,7 @@ impl Metadata {
 /// Has macro support.
 /// Also contains a restriction on the latex commands you use - you can't use one without
 /// declaring it. Atypical of this crate, this particular feature prevents a latex error.
+#[derive(Debug, Clone)]
 pub struct Document {
     document_class: DocumentClass,
     packages: Vec<Package>,

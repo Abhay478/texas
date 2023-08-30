@@ -1,6 +1,6 @@
 [package]
 name = "rust-texas"
-version = "0.2.5"
+version = "0.2.6"
 edition = "2021"
 description = "Crate to generate latex documents"
 license = "MIT"
