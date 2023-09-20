@@ -114,7 +114,13 @@ macro_rules! textchunk {
 macro_rules! tabular {
     ($i:literal, $h:ident) => {
         Component::Table(Table::new($i, $h))
-    }; // ($i:literal, [$($c:literal),*]) => {
-       //     Component::Table(Table::new($i, $h))
-       // };
+    };
 }
+
+// Cannot think of a way to do this cleanly. Ideas would be nice. Hit up the issues page.
+// #[macro_export]
+// macro_rules! builtin {
+//     ($which:literal, $arg:literal) => {
+        
+//     };
+// }

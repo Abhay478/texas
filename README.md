@@ -47,10 +47,9 @@ doc.new_package(package!("parskip", "parfill"));
 
 ## Log 
 
-- ### 0.2.3
-  - Lil cleanup
-  - Finally added the ensuremath stuff. Adding a bunch more.
 - ### 0.2.[45]
   - Nothing, really. Renamed the crate. Big whoop.
 - ### 0.2.6
   - Added a few Debug/Clone derives.
+- ### 0.2.7
+  - **Breaking changes** to `Builtin` introduced in 0.2.3, now hopefully cleaner.

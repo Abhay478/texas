@@ -25,49 +25,38 @@ pub enum Component {
 #[derive(Debug, Clone)]
 pub struct Builtin {
     typ: BuiltinType,
-    components: Vec<Component>,
 }
 impl AsLatex for Builtin {
     fn to_string(&self) -> String {
-        let comps = self
-            .components
-            .iter()
-            .map(|c| format!("{{{}}}", c.to_string()))
-            .collect::<String>();
-        format!("\\{}{} ", self.typ.to_string(), comps)
-    }
-}
-impl Populate for Builtin {
-    fn attach(&mut self, other: Component) -> Res<&mut Self> {
-        self.components.push(other);
-        Ok(self)
-    }
-
-    fn attach_vec(&mut self, mut other: Vec<Component>) -> Res<&mut Self> {
-        self.components.append(&mut other);
-        Ok(self)
+        format!("{}", self.typ.to_string())
     }
 }
 
 #[derive(Debug, Clone)]
 pub enum BuiltinType {
-    EnsureMath,
-    Sin,
-    Cos,
-    Tan,
-    Log,
+    EnsureMath(String),
+    Sin(String),
+    Cos(String),
+    Tan(String),
+    Log(String),
+    Ln(String),
+    Sum(String, String),
+    Prod(String, String)
 }
 impl Display for BuiltinType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
             "{}",
-            match &self {
-                Self::EnsureMath => "ensuremath",
-                Self::Cos => "cos",
-                Self::Sin => "sin",
-                Self::Tan => "tan",
-                Self::Log => "log",
+            match self {
+                Self::EnsureMath(s) => format!("\\ensuremath{{{}}}", s),
+                Self::Sin(s) => format!("\\sin{{{}}}", s),
+                Self::Cos(s) => format!("\\cos{{{}}}", s),
+                Self::Tan(s) => format!("\\tan{{{}}}", s),
+                Self::Log(s) => format!("\\log{{{}}}", s),
+                Self::Ln(s) => format!("\\ln{{{}}}", s),
+                Self::Sum(down, up) => format!("\\sum_{{{down}}}^{{{up}}}"),
+                Self::Prod(down, up) => format!("\\prod_{{{down}}}^{{{up}}}"),
             }
         )?;
 
@@ -663,8 +652,8 @@ impl Populate for Component {
             Self::Table(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Builtin(stuff) => {
-                stuff.attach(other)?;
+            Self::Builtin(_) => {
+                return Err(TexError::TraitUnimplemented.into());
             }
         };
 
@@ -722,8 +711,8 @@ impl Populate for Component {
             Self::Table(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Builtin(stuff) => {
-                stuff.attach_vec(other)?;
+            Self::Builtin(_) => {
+                return Err(TexError::TraitUnimplemented.into());
             }
         };
 
