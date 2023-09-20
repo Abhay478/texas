@@ -114,8 +114,7 @@ macro_rules! textchunk {
 macro_rules! tabular {
     ($i:literal, $h:ident) => {
         Component::Table(Table::new($i, $h))
-    };
-    // ($i:literal, [$($c:literal),*]) => {
-    //     Component::Table(Table::new($i, $h))
-    // };
+    }; // ($i:literal, [$($c:literal),*]) => {
+       //     Component::Table(Table::new($i, $h))
+       // };
 }

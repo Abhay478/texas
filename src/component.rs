@@ -19,17 +19,21 @@ pub enum Component {
     Image(Image),
     Table(Table),
     Row(Row),
-    Builtin(Builtin)
+    Builtin(Builtin),
 }
 
 #[derive(Debug, Clone)]
 pub struct Builtin {
     typ: BuiltinType,
-    components: Vec<Component>
+    components: Vec<Component>,
 }
 impl AsLatex for Builtin {
     fn to_string(&self) -> String {
-        let comps = self.components.iter().map(|c| format!("{{{}}}", c.to_string())).collect::<String>();
+        let comps = self
+            .components
+            .iter()
+            .map(|c| format!("{{{}}}", c.to_string()))
+            .collect::<String>();
         format!("\\{}{} ", self.typ.to_string(), comps)
     }
 }
@@ -51,17 +55,21 @@ pub enum BuiltinType {
     Sin,
     Cos,
     Tan,
-    Log
+    Log,
 }
 impl Display for BuiltinType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match &self {
-            Self::EnsureMath => "ensuremath",
-            Self::Cos => "cos",
-            Self::Sin => "sin",
-            Self::Tan => "tan",
-            Self::Log => "log",
-        })?;
+        write!(
+            f,
+            "{}",
+            match &self {
+                Self::EnsureMath => "ensuremath",
+                Self::Cos => "cos",
+                Self::Sin => "sin",
+                Self::Tan => "tan",
+                Self::Log => "log",
+            }
+        )?;
 
         Ok(())
     }
@@ -73,7 +81,14 @@ pub struct Row {
 }
 impl AsLatex for Row {
     fn to_string(&self) -> String {
-        format!("{} \\\\ \n", self.cells[1..].iter().fold(format!("{}", self.cells[0].to_string()), |acc, x| acc + " & " + &x.to_string()))
+        format!(
+            "{} \\\\ \n",
+            self.cells[1..]
+                .iter()
+                .fold(format!("{}", self.cells[0].to_string()), |acc, x| acc
+                    + " & "
+                    + &x.to_string())
+        )
     }
 }
 impl Populate for Row {
@@ -102,7 +117,12 @@ impl AsLatex for Table {
     fn to_string(&self) -> String {
         let s = (0..self.col).fold("|".to_string(), |acc, _x| acc + "c|");
         let rows = self.rows.iter().map(|x| x.to_string()).collect::<String>();
-        format!("\\begin{{tabular}}{{{}}} \n \\hline \n {} \n \\hline \n {} \\hline \\end{{tabular}} ", s, self.head.to_string(), rows)
+        format!(
+            "\\begin{{tabular}}{{{}}} \n \\hline \n {} \n \\hline \n {} \\hline \\end{{tabular}} ",
+            s,
+            self.head.to_string(),
+            rows
+        )
     }
 }
 impl Populate for Table {
@@ -117,10 +137,13 @@ impl Populate for Table {
 }
 impl Table {
     pub fn new(col: usize, head: Row) -> Self {
-        Self { col, rows: vec![], head }
+        Self {
+            col,
+            rows: vec![],
+            head,
+        }
     }
 }
-
 
 /// Images!
 /// Please enable images for the current document before using: `doc.enable_graphicx(path)`

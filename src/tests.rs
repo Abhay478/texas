@@ -1,4 +1,3 @@
-
 use crate::*;
 use std::fs;
 use std::io::Write;
@@ -163,4 +162,3 @@ fn seventh() -> Null {
 
     Ok(())
 }
-

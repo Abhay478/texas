@@ -111,19 +111,21 @@ pub struct Metadata {
     author: String,
     pub maketitle: bool,
     pub tableofcontents: bool,
+    pub date: bool,
 }
 impl AsLatex for Metadata {
     fn to_string(&self) -> String {
         format!(
-            "\\title{{{}}}\n\\author{{{}}}\n{}\n{}\n",
+            "\\title{{{}}}\n\\author{{{}}}\n{}\n{}\n{}\n",
             self.title,
             self.author,
-            if self.maketitle { "\\maketitle" } else { "" },
+            if self.date { r"\today" } else { "" },
+            if self.maketitle { r"\maketitle" } else { "" },
             if self.tableofcontents {
-                "\\tableofcontents"
+                r"\tableofcontents"
             } else {
                 ""
-            }
+            },
         )
     }
 }
@@ -134,6 +136,7 @@ impl Metadata {
             author: author.to_string(),
             maketitle: true,
             tableofcontents: false,
+            date: true,
         }
     }
 }
@@ -173,10 +176,14 @@ impl AsLatex for Document {
             .map(|x| format!("{} \n", x.1.declare()))
             .collect::<String>();
 
-        let gpath = if let Some(path) = &self.graphics_path { 
-            format!("\\graphicspath{{{}}} \n", path.iter().map(|x| format!("{{{}}}, ", x)).collect::<String>())
-        }
-        else {
+        let gpath = if let Some(path) = &self.graphics_path {
+            format!(
+                "\\graphicspath{{{}}} \n",
+                path.iter()
+                    .map(|x| format!("{{{}}}, ", x))
+                    .collect::<String>()
+            )
+        } else {
             "".to_string()
         };
         format!(

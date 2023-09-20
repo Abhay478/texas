@@ -10,7 +10,7 @@ impl From<&str> for TextType {
             "inline" => Self::InlineMath,
             "display" => Self::DisplayMath,
             "scope" => Self::Scope,
-            _ => Self::Normal
+            _ => Self::Normal,
         }
     }
 }
