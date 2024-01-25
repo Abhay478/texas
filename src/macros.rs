@@ -41,8 +41,15 @@ macro_rules! environment {
 /// This could've gotten real ugly if you had to do it yourself.
 /// So whenever you've got a latex macro you defined earlier, and want to use it, use this macro.
 /// ```rust
-/// command!(<your document variable>, "<your command/macro name>", <appropriate arguments to the command>)
+/// use rust_texas::*;
+/// fn dummy() -> Result<(), Box<dyn std::error::Error>> {
+///     let mut doc = document!("article");
+///     command!(doc, "<your command/macro name>", "<appropriate arguments to the command>");
+///     Ok(())
+/// }
 /// ```
+///
+/// doc-tests need all the stuff above to pass
 #[macro_export]
 macro_rules! command {
     ($doc:ident, $cmd:literal, $( $x:expr ),*) => {
@@ -61,7 +68,8 @@ macro_rules! document {
 /// This, too, could've gotten ugly.
 /// Package creation with options.
 /// ```rust
-/// package!("<package name>", <whatever options you want, as _literals_ >)
+/// use rust_texas::*;
+/// package!("amsmath", "<whatever options you want, as literals>");
 /// ```
 #[macro_export]
 macro_rules! package {
@@ -102,7 +110,7 @@ macro_rules! row {
 /// Convenient, I hope?
 #[macro_export]
 macro_rules! textchunk {
-    ($txt:literal, $mode:literal) => {{
+    ($txt:expr, $mode:literal) => {{
         let typ = TextType::from($mode);
         Component::TextChunk(TextChunk::new($txt, typ))
     }};
@@ -118,9 +126,9 @@ macro_rules! tabular {
 }
 
 // Cannot think of a way to do this cleanly. Ideas would be nice. Hit up the issues page.
-// #[macro_export]
-// macro_rules! builtin {
-//     ($which:literal, $arg:literal) => {
-        
-//     };
-// }
+#[macro_export]
+macro_rules! builtin {
+    ($arg:expr) => {
+        Component::Builtin(Builtin::new($arg))
+    };
+}

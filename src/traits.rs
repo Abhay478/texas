@@ -4,6 +4,7 @@ pub trait AsLatex {
 }
 
 pub trait Populate {
+    /// Weird return type for chaining attaches.
     fn attach(&mut self, other: Component) -> Res<&mut Self>;
     fn attach_vec(&mut self, other: Vec<Component>) -> Res<&mut Self>;
 }

@@ -9,6 +9,7 @@ use crate::*;
 #[derive(Debug, Clone)]
 pub enum DocumentClassType {
     Article,
+    Amsart,
     Part,
     Report,
     Book,
@@ -23,6 +24,7 @@ impl Display for DocumentClassType {
                 Self::Part => "part",
                 Self::Report => "report",
                 Self::Book => "book",
+                Self::Amsart => "amsart",
             }
         )?;
 
@@ -36,6 +38,7 @@ impl From<&str> for DocumentClassType {
             "part" => Self::Part,
             "book" => Self::Book,
             "report" => Self::Report,
+            "amsart" => Self::Amsart,
             _ => Self::Article,
         }
     }
@@ -153,7 +156,7 @@ pub struct Document {
     components: Vec<Component>,
     commands: HashMap<String, Command>,
     img: bool,
-    // misc: String
+    scratch: bool,
     graphics_path: Option<Vec<String>>,
 }
 impl AsLatex for Document {
@@ -164,7 +167,11 @@ impl AsLatex for Document {
             .iter()
             .map(|x| x.to_string())
             .collect::<String>();
-        let md = self.metadata.to_string();
+        let md = if !self.scratch {
+            self.metadata.to_string()
+        } else {
+            "".to_string()
+        };
         let body = self
             .components
             .iter()
@@ -201,6 +208,7 @@ impl Document {
             components: vec![],
             commands: HashMap::new(),
             img: false,
+            scratch: false,
             graphics_path: None,
         }
     }
@@ -210,6 +218,10 @@ impl Document {
             Some(s) => Ok(s.clone()),
             None => Err(TexError::Undefined.into()),
         }
+    }
+
+    pub fn scratch(&mut self) {
+        self.scratch = true;
     }
 
     pub fn new_command(&mut self, c: Command) {
@@ -241,5 +253,18 @@ impl Document {
 impl Opt for Document {
     fn add_option(&mut self, opt: &str) {
         self.document_class.add_option(opt);
+    }
+}
+impl Populate for Document {
+    fn attach(&mut self, other: Component) -> Res<&mut Self> {
+        self.new_component(other);
+        Ok(self)
+    }
+
+    fn attach_vec(&mut self, other: Vec<Component>) -> Res<&mut Self> {
+        for i in other {
+            self.attach(i)?;
+        }
+        Ok(self)
     }
 }

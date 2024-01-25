@@ -162,3 +162,19 @@ fn seventh() -> Null {
 
     Ok(())
 }
+
+#[test]
+fn eighth() -> Null {
+    let mut q = fs::File::create("tex/eighth.tex")?;
+    // let mut q = fs::File::options().write(true).open("tex/quaternary.tex")?;
+    let mut doc = document!("");
+    doc.scratch();
+    // doc.attach(Component::Builtin(Builtin::new(BuiltinType::Character("infty".to_string()))))?;
+    doc.attach(textchunk!(
+        &builtin!(BuiltinType::Character("phi".to_string())).to_string(),
+        "inline"
+    ))?;
+    writeln!(q, "{}", doc.to_string())?;
+
+    Ok(())
+}

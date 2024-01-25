@@ -47,9 +47,10 @@ doc.new_package(package!("parskip", "parfill"));
 
 ## Log 
 
-- ### 0.2.[45]
-  - Nothing, really. Renamed the crate. Big whoop.
 - ### 0.2.6
   - Added a few Debug/Clone derives.
 - ### 0.2.7
   - **Breaking changes** to `Builtin` introduced in 0.2.3, now hopefully cleaner.
+- ### 0.2.8
+  - Fixed doctests
+  - Modified builtins a little. You can now use all the little `\phi` `\infty` stuff. I will be improving the syntax for this in the future.
