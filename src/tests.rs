@@ -6,7 +6,7 @@ use std::io::Write;
 fn primary() -> Null {
     let mut q = fs::File::create("tex/primary.tex")?;
     let mut doc = Document::new(DocumentClass::new("article"));
-    doc.set_md("title", "author");
+    doc.set_md("title", &["author"]);
     let mut p1 = Package::new("parskip");
     p1.add_option("parfill");
     doc.new_package(p1);
@@ -21,7 +21,7 @@ fn secondary() -> Null {
     // let mut q = fs::File::create("tex/secondary.tex")?;
     let mut q = fs::File::options().write(true).open("tex/secondary.tex")?;
     let mut doc = Document::new(DocumentClass::new("book"));
-    doc.set_md("title", "author");
+    doc.set_md("title", &["author"]);
     let mut p1 = Package::new("parskip");
     p1.add_option("parfill");
     doc.new_package(p1);
@@ -71,7 +71,7 @@ fn tertiary() -> Null {
     let mut q = fs::File::create("tex/tertiary.tex")?;
     // let mut q = fs::File::options().write(true).open("tex/tertiary.tex")?;
     let mut doc = Document::new(DocumentClass::new("book"));
-    doc.set_md("title", "author");
+    doc.set_md("title", &["author"]);
     let mut p1 = Package::new("parskip");
     p1.add_option("parfill");
     doc.new_package(p1);
@@ -174,6 +174,18 @@ fn eighth() -> Null {
         &builtin!(BuiltinType::Character("phi".to_string())).to_string(),
         "inline"
     ))?;
+    writeln!(q, "{}", doc.to_string())?;
+
+    Ok(())
+}
+
+#[test]
+fn ninth() -> Null {
+    let mut q = fs::File::create("tex/ninth.tex")?;
+    // let mut q = fs::File::options().write(true).open("tex/quaternary.tex")?;
+    let mut doc = document!("beamer");
+    doc.set_md("title", &["author"]);
+    doc.attach(Component::Frame(Frame::untitled_with_components(vec![textchunk!("Hello, world!", "normal")])))?;
     writeln!(q, "{}", doc.to_string())?;
 
     Ok(())

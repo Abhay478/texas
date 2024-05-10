@@ -132,3 +132,11 @@ macro_rules! builtin {
         Component::Builtin(Builtin::new($arg))
     };
 }
+
+#[macro_export]
+macro_rules! frame {
+    ($title:expr) => {
+        Component::Frame(Frame::new($title))
+    };
+
+}

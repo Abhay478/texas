@@ -1,6 +1,6 @@
 [package]
 name = "rust-texas"
-version = "0.2.8"
+version = "0.3.0"
 edition = "2021"
 description = "Crate to generate latex documents"
 license = "MIT"
@@ -13,3 +13,4 @@ author = "Abhay Shankar K"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+itertools = "0.12.1"

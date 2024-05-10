@@ -1,5 +1,6 @@
+use core::str;
 use std::{fmt::Display, fs::File, io::Read};
-
+use itertools::Itertools;
 use crate::*;
 
 /// One of the main structs, almost everything you put into a document is a `Component`
@@ -9,6 +10,8 @@ pub enum Component {
     Chapter(Chapter),
     Section(Section),
     Subsection(Subsection),
+    Frame(Frame),
+    Block(Block),
     Paragraph(Paragraph),
     Line(Line),
     Input(Input),
@@ -20,6 +23,116 @@ pub enum Component {
     Table(Table),
     Row(Row),
     Builtin(Builtin),
+}
+
+#[derive(Debug, Clone)]
+pub struct Frame {
+    title: String,
+    components: Vec<Component>,
+}
+
+impl AsLatex for Frame {
+    fn to_string(&self) -> String {
+        let comps = self
+            .components
+            .iter()
+            .map(|s| s.to_string())
+            .collect::<String>();
+        format!(
+            "\\begin{{frame}}{{{}}} \n {} \\end{{frame}} \n ",
+            self.title, comps
+        )
+    }
+}
+
+impl Populate for Frame {
+    fn attach(&mut self, other: Component) -> Res<&mut Self> {
+        self.components.push(other);
+        Ok(self)
+    }
+    fn attach_vec(&mut self, mut other: Vec<Component>) -> Res<&mut Self> {
+        self.components.append(&mut other);
+        Ok(self)
+    }
+}
+
+impl Frame {
+    pub fn new(title: &str) -> Self {
+        Self {
+            title: title.to_string(),
+            components: vec![],
+        }
+    }
+
+    pub fn new_untitled() -> Self {
+        Self::new("")
+    }
+
+    pub fn untitled_with_components(components: Vec<Component>) -> Self {
+        Self::with_components("", components)
+    }
+
+    pub fn with_components(title: &str, components: Vec<Component>) -> Self {
+        Self {
+            title: title.to_string(),
+            components,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Block {
+    title: String,
+    components: Vec<Component>,
+}
+
+impl AsLatex for Block {
+    fn to_string(&self) -> String {
+        let comps = self
+            .components
+            .iter()
+            .map(|s| s.to_string())
+            .collect::<String>();
+        format!(
+            "\\begin{{block}}{{{}}} \n {} \\end{{block}} \n ",
+            self.title, comps
+        )
+    }
+}
+
+impl Populate for Block {
+    fn attach(&mut self, other: Component) -> Res<&mut Self> {
+        self.components.push(other);
+        Ok(self)
+    }
+    fn attach_vec(&mut self, mut other: Vec<Component>) -> Res<&mut Self> {
+        self.components.append(&mut other);
+        Ok(self)
+    }
+}
+
+impl Block {
+    pub fn new(title: &str) -> Self {
+        Self {
+            title: title.to_string(),
+            components: vec![],
+        }
+    }
+
+    pub fn new_untitled() -> Self {
+        Self::new("")
+    }
+
+    pub fn untitled_with_components(components: Vec<Component>) -> Self {
+        Self::with_components("", components)
+    }
+
+    pub fn with_components(title: &str, components: Vec<Component>) -> Self {
+        Self {
+            title: title.to_string(),
+            components,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -44,6 +157,7 @@ pub enum BuiltinType {
     Tan(TextChunk),
     Log(TextChunk),
     Ln(TextChunk),
+    Lg(TextChunk),
     Sum(TextChunk, TextChunk),
     Prod(TextChunk, TextChunk),
     Arg(TextChunk),
@@ -63,6 +177,7 @@ impl Display for BuiltinType {
                 Self::Tan(s) => format!("\\tan{{{}}}", s.to_string()),
                 Self::Log(s) => format!("\\log{{{}}}", s.to_string()),
                 Self::Ln(s) => format!("\\ln{{{}}}", s.to_string()),
+                Self::Lg(s) => format!("\\lg{{{}}}", s.to_string()),
                 Self::Sum(down, up) =>
                     format!("\\sum_{{{}}}^{{{}}}", down.to_string(), up.to_string()),
                 Self::Prod(down, up) =>
@@ -86,11 +201,7 @@ impl AsLatex for Row {
     fn to_string(&self) -> String {
         format!(
             "{} \\\\ \n",
-            self.cells[1..]
-                .iter()
-                .fold(format!("{}", self.cells[0].to_string()), |acc, x| acc
-                    + " & "
-                    + &x.to_string())
+            self.cells.iter().map(|x| x.to_string()).join(" & ")
         )
     }
 }
@@ -107,6 +218,10 @@ impl Populate for Row {
 impl Row {
     pub fn new() -> Self {
         Self { cells: vec![] }
+    }
+
+    pub fn with_cells(cells: Vec<Component>) -> Self {
+        Self { cells }
     }
 }
 /// Tables!
@@ -146,10 +261,14 @@ impl Table {
             head,
         }
     }
+
+    pub fn with_rows(col: usize, head: Row, rows: Vec<Component>) -> Self {
+        Self { col, rows, head }
+    }
 }
 
 /// Images!
-/// Please enable images for the current document before using: `doc.enable_graphicx(path)`
+/// Please enable images for the current document before, using: `doc.enable_graphicx(path)`
 #[derive(Debug, Clone)]
 pub struct Image {
     path: String,
@@ -175,6 +294,13 @@ impl Image {
         Self {
             path: path.to_string(),
             opt: vec![],
+        }
+    }
+
+    pub fn with_options(path: &str, opt: Vec<String>) -> Self {
+        Self {
+            path: path.to_string(),
+            opt,
         }
     }
 }
@@ -212,6 +338,13 @@ impl Part {
             components: vec![],
         }
     }
+
+    pub fn with_components(name: &str, components: Vec<Component>) -> Self {
+        Self {
+            name: name.to_string(),
+            components,
+        }
+    }
 }
 
 /// \chapter{}: Only available for \documentclass{book}
@@ -245,6 +378,13 @@ impl Chapter {
         Self {
             name: name.to_string(),
             components: vec![],
+        }
+    }
+
+    pub fn with_components(name: &str, components: Vec<Component>) -> Self {
+        Self {
+            name: name.to_string(),
+            components,
         }
     }
 }
@@ -282,6 +422,13 @@ impl Section {
             components: vec![],
         }
     }
+
+    pub fn with_components(name: &str, components: Vec<Component>) -> Self {
+        Self {
+            name: name.to_string(),
+            components,
+        }
+    }
 }
 
 /// \subsection{}
@@ -317,6 +464,13 @@ impl Subsection {
             components: vec![],
         }
     }
+
+    pub fn with_components(name: &str, components: Vec<Component>) -> Self {
+        Self {
+            name: name.to_string(),
+            components,
+        }
+    }
 }
 
 /// Block of text bracketed by "\n\n". Generates a latex paragraph.
@@ -347,6 +501,10 @@ impl Populate for Paragraph {
 impl Paragraph {
     pub fn new() -> Self {
         Self { components: vec![] }
+    }
+
+    pub fn with_components(components: Vec<Component>) -> Self {
+        Self { components }
     }
 }
 
@@ -383,6 +541,10 @@ impl Line {
     pub fn new() -> Self {
         Self { components: vec![] }
     }
+
+    pub fn with_components(components: Vec<Component>) -> Self {
+        Self { components }
+    }
 }
 
 /// Basic text struct. Typically, a `Paragraph` or `Line` contains a bunch of these.
@@ -398,6 +560,11 @@ impl AsLatex for TextChunk {
             TextType::Normal => format!("{} ", self.body),
             TextType::Italic => format!("\\textit{{{}}} ", self.body),
             TextType::Bold => format!("\\textbf{{{}}} ", self.body),
+            TextType::Teletype => format!("\\texttt{{{}}} ", self.body),
+            TextType::MathBold => format!("\\mathbf{{{}}} ", self.body),
+            TextType::MathCal => format!("\\mathcal{{{}}} ", self.body),
+            TextType::MathBb => format!("\\mathbb{{{}}} ", self.body),
+            TextType::MathRm => format!("\\mathrm{{{}}} ", self.body),
             TextType::Underlined => format!("\\underline{{{}}} ", self.body),
             TextType::InlineMath => format!("\\({}\\)", self.body),
             TextType::DisplayMath => format!("\\[{}\\]", self.body),
@@ -444,7 +611,8 @@ impl TextChunk {
     }
 }
 
-/// \input{}, if you want that kinda thing. Personally, I've never used it.
+/// \input{}, if you want that kinda thing. ~Personally, I've never used it.~
+/// I _have_ used it. Pretty useful.
 #[derive(Debug, Clone)]
 pub struct Input {
     name: String,
@@ -504,13 +672,13 @@ impl Environment {
 /// OG List, itemize or enumerate. If y'all want description, please put up an issue.
 #[derive(Debug, Clone)]
 pub struct List {
-    components: Vec<Component>,
+    items: Vec<Component>,
     typ: ListType,
 }
 impl AsLatex for List {
     fn to_string(&self) -> String {
         let comps = self
-            .components
+            .items
             .iter()
             .map(|s| format!("\t\\item {}\n", s.to_string()))
             .collect::<String>();
@@ -524,20 +692,24 @@ impl AsLatex for List {
 }
 impl Populate for List {
     fn attach(&mut self, other: Component) -> Res<&mut Self> {
-        self.components.push(other);
+        self.items.push(other);
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> Res<&mut Self> {
-        self.components.extend(other.into_iter());
+        self.items.extend(other.into_iter());
         Ok(self)
     }
 }
 impl List {
     pub fn new(typ: ListType) -> Self {
         Self {
-            components: vec![],
+            items: vec![],
             typ,
         }
+    }
+
+    pub fn with_items(typ: ListType, items: Vec<Component>) -> Self {
+        Self { items, typ }
     }
 }
 
@@ -564,11 +736,18 @@ impl Display for ListType {
 
 /// Italics and stuff. Also includes the mathy \\(..\\) and \\[...\\], as well as the Scope variant, \\{...\\}
 /// If y'all want more (like \textbb{}, \texttt{}, etc.) please put up an issue.
+/// A few fonts come from packages, which I'm not handling. 
+/// You'll get a latex error if you don't also include the package.
 #[derive(Debug, Clone)]
 pub enum TextType {
     Normal,
     Bold,
     Italic,
+    Teletype,
+    MathBold,
+    MathCal,
+    MathBb,
+    MathRm,
     Underlined,
     InlineMath,
     DisplayMath,
@@ -581,6 +760,8 @@ impl Component {
             Self::Part(_) => 0,
             Self::Chapter(_) => 1,
             Self::Section(_) => 2,
+            Self::Frame(_) => 4,
+            Self::Block(_) => 5,
             Self::Paragraph(_) => 5,
             Self::Line(_) => 10,
             Self::Input(_) => 9,
@@ -602,6 +783,8 @@ impl AsLatex for Component {
             Self::Part(stuff) => stuff.to_string(),
             Self::Chapter(stuff) => stuff.to_string(),
             Self::Section(stuff) => stuff.to_string(),
+            Self::Frame(stuff) => stuff.to_string(),
+            Self::Block(stuff) => stuff.to_string(),
             Self::Paragraph(stuff) => stuff.to_string(),
             Self::Line(stuff) => stuff.to_string(),
             Self::Input(stuff) => stuff.to_string(),
@@ -631,6 +814,12 @@ impl Populate for Component {
                 stuff.attach(other)?;
             }
             Self::Section(stuff) => {
+                stuff.attach(other)?;
+            }
+            Self::Frame(stuff) => {
+                stuff.attach(other)?;
+            }
+            Self::Block(stuff) => {
                 stuff.attach(other)?;
             }
             Self::Subsection(stuff) => {
@@ -690,6 +879,12 @@ impl Populate for Component {
                 stuff.attach_vec(other)?;
             }
             Self::Section(stuff) => {
+                stuff.attach_vec(other)?;
+            }
+            Self::Frame(stuff) => {
+                stuff.attach_vec(other)?;
+            }
+            Self::Block(stuff) => {
                 stuff.attach_vec(other)?;
             }
             Self::Paragraph(stuff) => {

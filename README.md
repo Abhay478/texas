@@ -47,10 +47,13 @@ doc.new_package(package!("parskip", "parfill"));
 
 ## Log 
 
-- ### 0.2.6
-  - Added a few Debug/Clone derives.
-- ### 0.2.7
-  - **Breaking changes** to `Builtin` introduced in 0.2.3, now hopefully cleaner.
 - ### 0.2.8
   - Fixed doctests
   - Modified builtins a little. You can now use all the little `\phi` `\infty` stuff. I will be improving the syntax for this in the future.
+- ### 0.3.0
+  - Aight, this is a big one.
+  - Added `Beamer` documentclass.
+    - Yet to add themes. 
+  - Added more `TextType`s.
+  - Added `with_components` methods to various structs.
+  - Some cleanup.

@@ -1,18 +1,21 @@
 use std::{collections::HashMap, fmt::Display};
 
+use itertools::Itertools;
+
 use crate::*;
 
 /// Currently, only these four types are supported.
 /// There is also nothing preventing you from putting a \part{} in a document of class "part",
 /// but latex will show an error. If you want those restrictions to be implemented, please put
 /// up an issue
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DocumentClassType {
     Article,
     Amsart,
     Part,
     Report,
     Book,
+    Beamer,
 }
 impl Display for DocumentClassType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -25,6 +28,7 @@ impl Display for DocumentClassType {
                 Self::Report => "report",
                 Self::Book => "book",
                 Self::Amsart => "amsart",
+                Self::Beamer => "beamer",
             }
         )?;
 
@@ -39,6 +43,7 @@ impl From<&str> for DocumentClassType {
             "book" => Self::Book,
             "report" => Self::Report,
             "amsart" => Self::Amsart,
+            "beamer" => Self::Beamer,
             _ => Self::Article,
         }
     }
@@ -110,33 +115,54 @@ impl Package {
 /// Title and author, if y'all want more, please put up an issue.
 #[derive(Debug, Clone)]
 pub struct Metadata {
+    class: DocumentClass,
     title: String,
-    author: String,
+    author: Vec<String>,
     pub maketitle: bool,
     pub tableofcontents: bool,
     pub date: bool,
 }
 impl AsLatex for Metadata {
     fn to_string(&self) -> String {
-        format!(
-            "\\title{{{}}}\n\\author{{{}}}\n{}\n{}\n{}\n",
+        let title_author = format!(
+            "\\title{{{}}}\n\\author{{{}}}\n",
             self.title,
-            self.author,
-            if self.date { r"\today" } else { "" },
-            if self.maketitle { r"\maketitle" } else { "" },
-            if self.tableofcontents {
-                r"\tableofcontents"
-            } else {
-                ""
-            },
-        )
+            self.author
+                .iter()
+                .join(r"\\ \and ")
+        );
+        match self.class {
+            DocumentClass {
+                typ: DocumentClassType::Beamer,
+                ..
+            } => {
+                // todo!()
+                format!(
+                    "{title_author}\n{}\n",
+                    if self.date { r"\date{\today}" } else { "" },
+                )
+            }
+            _ => {
+                format!(
+                    "{title_author}\n{}\n{}\n{}\n",
+                    if self.date { r"\today" } else { "" },
+                    if self.maketitle { r"\maketitle" } else { "" },
+                    if self.tableofcontents {
+                        r"\tableofcontents"
+                    } else {
+                        ""
+                    },
+                )
+            }
+        }
     }
 }
 impl Metadata {
-    pub fn new(title: &str, author: &str) -> Self {
+    pub fn new(class: DocumentClass, title: &str, author: &[&str]) -> Self {
         Self {
+            class,
             title: title.to_string(),
-            author: author.to_string(),
+            author: author.iter().map(|x| x.to_string()).collect(),
             maketitle: true,
             tableofcontents: false,
             date: true,
@@ -150,7 +176,7 @@ impl Metadata {
 /// declaring it. Atypical of this crate, this particular feature prevents a latex error.
 #[derive(Debug, Clone)]
 pub struct Document {
-    document_class: DocumentClass,
+    // document_class: DocumentClass,
     packages: Vec<Package>,
     pub metadata: Metadata,
     components: Vec<Component>,
@@ -161,7 +187,7 @@ pub struct Document {
 }
 impl AsLatex for Document {
     fn to_string(&self) -> String {
-        let dc = self.document_class.to_string();
+        let dc = self.metadata.class.to_string();
         let pkgs = self
             .packages
             .iter()
@@ -172,11 +198,27 @@ impl AsLatex for Document {
         } else {
             "".to_string()
         };
-        let body = self
-            .components
-            .iter()
-            .map(|x| x.to_string())
-            .collect::<String>();
+        let beamer_init_frames: String = if self.metadata.class.typ == DocumentClassType::Beamer {
+            // Warning: Unused result. Again, cannot n-choose-2 Component Variants.
+            let title_frame = Frame::with_components("", vec![textchunk!(r"\titlepage", "normal")]);
+
+            let mut toc = "".to_string();
+            if self.metadata.tableofcontents {
+                toc = Frame::with_components("", vec![textchunk!(r"\tableofcontents", "normal")])
+                    .to_string();
+            } ;
+
+            format!("{}\n{}\n", title_frame.to_string(), toc)
+        } else {
+            "\n".to_string()
+        };
+        let body = beamer_init_frames
+            + &self
+                .components
+                .iter()
+                .map(|x| x.to_string())
+                .collect::<String>();
+
         let cmd = self
             .commands
             .iter()
@@ -202,9 +244,9 @@ impl AsLatex for Document {
 impl Document {
     pub fn new(class: DocumentClass) -> Self {
         Self {
-            document_class: class,
+            // document_class: class,
             packages: vec![],
-            metadata: Metadata::new("title", "author"),
+            metadata: Metadata::new(class, "title", &["author"]),
             components: vec![],
             commands: HashMap::new(),
             img: false,
@@ -232,8 +274,9 @@ impl Document {
         self.components.push(new);
     }
 
-    pub fn set_md(&mut self, title: &str, author: &str) {
-        self.metadata = Metadata::new(title, author);
+    pub fn set_md(&mut self, title: &str, author: &[&str]) {
+        self.metadata.title = title.to_string();
+        self.metadata.author = author.iter().map(|x| x.to_string()).collect();
     }
 
     pub fn new_package(&mut self, new: Package) {
@@ -252,7 +295,7 @@ impl Document {
 }
 impl Opt for Document {
     fn add_option(&mut self, opt: &str) {
-        self.document_class.add_option(opt);
+        self.metadata.class.add_option(opt);
     }
 }
 impl Populate for Document {
