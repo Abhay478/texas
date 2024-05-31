@@ -9,6 +9,8 @@ pub enum TexError {
     RankMismatch,
     WhatEven(String),
     TraitUnimplemented,
+    VariantUndefined,
+    LabelUndefined,
     Undefined,
 }
 
@@ -22,6 +24,8 @@ impl Display for TexError {
                 Self::RankMismatch => "Rank mismatch.",
                 Self::WhatEven(s) => s.as_str(),
                 Self::Undefined => "Object not defined.",
+                Self::VariantUndefined => "The literal you provided does not correspond to a Variant. Please refer to the documentation for the list of valid literals.",
+                Self::LabelUndefined => "The label you provided does not exist.",
                 Self::TraitUnimplemented => "This variant of component does not implement the trait you desire (probably Populate)."
             }
         )?;
@@ -31,3 +35,5 @@ impl Display for TexError {
 }
 
 impl Error for TexError {}
+
+pub type TexResult<T> = Result<T, TexError>;

@@ -1,6 +1,9 @@
-use crate::*;
+use crate::prelude::*;
+use std::error::Error;
 use std::fs;
 use std::io::Write;
+
+type Null = Result<(), Box<dyn Error>>;
 
 #[test]
 fn primary() -> Null {
@@ -185,7 +188,31 @@ fn ninth() -> Null {
     // let mut q = fs::File::options().write(true).open("tex/quaternary.tex")?;
     let mut doc = document!("beamer");
     doc.set_md("title", &["author"]);
-    doc.attach(Component::Frame(Frame::untitled_with_components(vec![textchunk!("Hello, world!", "normal")])))?;
+    doc.attach(Component::Frame(Frame::untitled_with_components(vec![
+        textchunk!("Hello, world!", "normal"),
+    ])))?;
+    writeln!(q, "{}", doc.to_string())?;
+
+    Ok(())
+}
+
+#[test]
+fn tenth() -> Null {
+    let mut q = fs::File::create("tex/eleventh.tex")?;
+    let mut doc = document!("");
+    doc.scratch();
+
+    doc.attach(section!("s1"))?;
+    let l = Label::Section("qq".into());
+    // doc.add_label(&l);
+    doc.attach(Component::Label(l))?;
+
+    // let r = doc.get_ref("sec:qq")?;
+    doc.attach(Component::Reference("sec:qq".into()))?;
+
+    doc.attach(textchunk!(&format!("qqq {}", label!("qqq").to_string()), "inline"))?;
+    doc.attach(reference!("eq:qqq"))?;
+
     writeln!(q, "{}", doc.to_string())?;
 
     Ok(())

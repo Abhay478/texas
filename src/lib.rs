@@ -10,8 +10,6 @@
 //!
 //! A shout-out to another crate, `tex-rs`. A few of the design choices I made are based on this crate.
 
-use std::error::Error;
-
 /// Bunch of From<>s, they feel like they might be useful
 pub mod casting;
 
@@ -33,15 +31,23 @@ pub mod macros;
 /// Ubiquitous.
 pub mod traits;
 
+pub mod label;
+
 ///
 #[cfg(test)]
 mod tests;
 
-pub use commands::*;
-pub use component::*;
-pub use document::*;
-pub use errors::*;
-pub use traits::*;
+pub mod prelude {
+    pub use crate::commands::*;
+    pub use crate::component::*;
+    pub use crate::document::*;
+    pub use crate::errors::*;
+    pub use crate::label::*;
+    pub use crate::traits::*;
 
-type Res<T> = Result<T, Box<dyn Error>>;
-type Null = Res<()>;
+    // All the macros, again.
+    pub use crate::{
+        builtin, chapter, command, document, environment, frame, image, package, part, row,
+        section, tabular, textchunk, unwrap, reference, label
+    };
+}

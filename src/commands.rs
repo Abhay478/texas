@@ -1,6 +1,6 @@
 // commands, macros and stuff.
 
-use crate::*;
+use crate::prelude::*;
 
 /// Latex macros.
 /// Rudimentary so far, have to embed latex.
@@ -23,7 +23,7 @@ impl Command {
     }
 
     /// I'd really prefer you try and use the `command!` macro.
-    pub fn call(&self, args: Vec<&str>) -> Res<String> {
+    pub fn call(&self, args: Vec<&str>) -> TexResult<String> {
         if args.len() != self.nargs {
             return Err(TexError::ArgLen.into());
         }

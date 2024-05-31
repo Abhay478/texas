@@ -68,13 +68,14 @@ macro_rules! document {
 /// This, too, could've gotten ugly.
 /// Package creation with options.
 /// ```rust
-/// use rust_texas::*;
+/// use rust_texas::prelude::*;
 /// package!("amsmath", "<whatever options you want, as literals>");
 /// ```
 #[macro_export]
 macro_rules! package {
     ($pkg:literal$(,)? $( $opt:literal ),*) => {{
-        let mut package = Package::new($pkg); // You might get a warning here, please ignore.
+        #[allow(unused_mut)]
+        let mut package = Package::new($pkg);
         $(package.add_option($opt);)*
         package
     }};
@@ -138,5 +139,18 @@ macro_rules! frame {
     ($title:expr) => {
         Component::Frame(Frame::new($title))
     };
+}
 
+#[macro_export]
+macro_rules! label {
+    ($label:literal) => {
+        Component::Label(<&str as Into<Label>>::into($label))
+    };
+}
+
+#[macro_export]
+macro_rules! reference {
+    ($reference:literal) => {
+        Component::Reference(<&str as Into<Reference>>::into($reference))
+    };
 }
