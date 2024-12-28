@@ -143,16 +143,7 @@ fn sixth() -> Null {
 #[test]
 fn seventh() -> Null {
     let mut q = fs::File::create("tex/seventh.tex")?;
-    // let mut q = fs::File::options().write(true).open("tex/quaternary.tex")?;
     let mut doc = document!("");
-    // doc.new_command(Command::new("brak", 1, "\\ensuremath{\\left(#1\\right)}"));
-    // let mut p1 = section!("one");
-    // p1.attach(Component::Command(
-    //     doc.get_command("brak")?.call(vec!["hello"])?,
-    // ))?;
-    // p1.attach(command!(doc, "brak", "there"))?;
-    // // General Kenobi
-    // doc.new_component(p1);
     doc.new_package(package!("parskip", "parfill"));
     doc.enable_graphicx("../img");
     doc.new_component(image!("Screenshot 2023-07-15 at 1.42.09 PM.png"));
@@ -210,7 +201,10 @@ fn tenth() -> Null {
     // let r = doc.get_ref("sec:qq")?;
     doc.attach(Component::Reference("sec:qq".into()))?;
 
-    doc.attach(textchunk!(&format!("qqq {}", label!("qqq").to_string()), "inline"))?;
+    doc.attach(textchunk!(
+        &format!("qqq {}", label!("qqq").to_string()),
+        "inline"
+    ))?;
     doc.attach(reference!("eq:qqq"))?;
 
     writeln!(q, "{}", doc.to_string())?;

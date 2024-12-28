@@ -1,5 +1,5 @@
-use std::fmt::Display;
 use crate::prelude::*;
+use std::fmt::Display;
 
 /// Currently, only these few types are supported.
 /// There is also nothing preventing you from putting a \part{} in a document of class "part",

@@ -1,17 +1,14 @@
-use std::
-    collections::HashMap
-;
+use std::collections::HashMap;
 
 use crate::prelude::*;
 
 mod doc_class;
-mod package;
 mod metadata;
+mod package;
 
 pub use doc_class::*;
-pub use package::*;
 pub use metadata::*;
-
+pub use package::*;
 
 /// The king of the land. The `Document` type is where you start.
 /// Has macro support.
@@ -28,7 +25,7 @@ pub struct Document {
     img: bool,
     href: bool,
     scratch: bool,
-    graphics_path: Option<Vec<String>>,
+    graphics_path: Vec<String>,
 }
 impl AsLatex for Document {
     fn to_string(&self) -> String {
@@ -70,10 +67,11 @@ impl AsLatex for Document {
             .map(|x| format!("{} \n", x.1.declare()))
             .collect::<String>();
 
-        let gpath = if let Some(path) = &self.graphics_path {
+        let gpath = if self.graphics_path.len() > 0 {
             format!(
                 "\\graphicspath{{{}}} \n",
-                path.iter()
+                self.graphics_path
+                    .iter()
                     .map(|x| format!("{{{}}}, ", x))
                     .collect::<String>()
             )
@@ -98,7 +96,7 @@ impl Document {
             img: true,
             href: true,
             scratch: false,
-            graphics_path: None,
+            graphics_path: vec![".".to_string()],
         };
         out.new_package(package!("graphicx"));
         out.new_package(package!("hyperref"));
@@ -136,13 +134,13 @@ impl Document {
     pub fn enable_graphicx(&mut self, path: &str) {
         self.img = true;
         self.new_package(package!("graphicx"));
-        self.graphics_path = Some(vec![path.to_string()]);
+        self.graphics_path = vec![path.to_string()];
     }
 
     pub fn disable_graphicx(&mut self) {
         self.img = false;
         self.packages.retain(|x| x.name != "graphicx");
-        self.graphics_path = None;
+        self.graphics_path = vec![];
     }
 
     pub fn enable_hyperref(&mut self) {
@@ -156,7 +154,7 @@ impl Document {
     }
 
     pub fn push_gpath(&mut self, path: &str) {
-        self.graphics_path.as_mut().unwrap().push(path.to_string());
+        self.graphics_path.push(path.to_string());
     }
 }
 impl Opt for Document {
@@ -170,10 +168,14 @@ impl Populate for Document {
         Ok(self)
     }
 
-    fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
         for i in other {
             self.attach(i)?;
         }
         Ok(self)
+    }
+
+    fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
+        self.attach_iter(other.into_iter())
     }
 }

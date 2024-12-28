@@ -6,6 +6,7 @@ pub use builtin::*;
 pub use envs::*;
 pub use hierarchy::*;
 pub use image::*;
+// use markdown::mdast::Node;
 pub use misc::*;
 pub use table::*;
 pub use textchunk::*;
@@ -30,7 +31,8 @@ pub enum Component {
     Figure(Figure),
 
     TextChunk(TextChunk),
-
+    // #[cfg(feature = "markdown")]
+    // Markdown(MarkdownChunk),
     Command(String),
 
     /// Outside the figure environment. Sometimes useful.
@@ -43,6 +45,7 @@ pub enum Component {
 
     Label(Label),
     Reference(Reference),
+    // Dummy(Vec<Component>)
 }
 
 pub mod beamer;
@@ -57,60 +60,64 @@ pub mod textchunk;
 impl Component {
     pub fn rank(&self) -> u8 {
         match &self {
-            Self::Part(_) => 0,
-            Self::Chapter(_) => 1,
-            Self::Section(_) => 2,
-            Self::Subsection(_) => 3,
-            Self::Paragraph(_) => 5,
-            Self::Line(_) => 10,
-            Self::Frame(_) => 4,
-            Self::Block(_) => 5,
+            Component::Part(_) => 0,
+            Component::Chapter(_) => 1,
+            Component::Section(_) => 2,
+            // #[cfg(feature = "markdown")]
+            // Component::Markdown(_) => 2,
+            Component::Subsection(_) => 3,
+            Component::Paragraph(_) => 5,
+            Component::Line(_) => 10,
+            Component::Frame(_) => 4,
+            Component::Block(_) => 5,
 
-            Self::Input(_) => 9,
+            Component::Input(_) => 9,
 
-            Self::Environment(_) => 8,
-            Self::List(_) => 7,
-            Self::Figure(_) => 8,
+            Component::Environment(_) => 8,
+            Component::List(_) => 7,
+            Component::Figure(_) => 8,
 
-            Self::TextChunk(_) => 10,
+            Component::TextChunk(_) => 10,
 
-            Self::Command(_) => 10,
+            Component::Command(_) => 10,
 
-            Self::Image(_) => 10,
+            Component::Image(_) => 10,
 
-            Self::Table(_) => 7,
+            Component::Table(_) => 7,
 
-            Self::Row(_) => 10,
+            Component::Row(_) => 10,
 
-            Self::Builtin(_) => 10,
-            Self::Label(_) => 10,
-            Self::Reference(_) => 10,
+            Component::Builtin(_) => 10,
+            Component::Label(_) => 10,
+            Component::Reference(_) => 10,
         }
     }
 }
 impl AsLatex for Component {
     fn to_string(&self) -> String {
         match &self {
-            Self::Part(stuff) => stuff.to_string(),
-            Self::Chapter(stuff) => stuff.to_string(),
-            Self::Section(stuff) => stuff.to_string(),
-            Self::Frame(stuff) => stuff.to_string(),
-            Self::Block(stuff) => stuff.to_string(),
-            Self::Paragraph(stuff) => stuff.to_string(),
-            Self::Line(stuff) => stuff.to_string(),
-            Self::Input(stuff) => stuff.to_string(),
-            Self::Environment(stuff) => stuff.to_string(),
-            Self::List(stuff) => stuff.to_string(),
-            Self::TextChunk(stuff) => stuff.to_string(),
-            Self::Command(stuff) => stuff.to_string(),
-            Self::Subsection(stuff) => stuff.to_string(),
-            Self::Image(stuff) => stuff.to_string(),
-            Self::Row(stuff) => stuff.to_string(),
-            Self::Table(stuff) => stuff.to_string(),
-            Self::Builtin(stuff) => stuff.to_string(),
-            Self::Figure(stuff) => stuff.to_string(),
-            Self::Label(stuff) => stuff.to_string(),
-            Self::Reference(stuff) => stuff.to_string(),
+            Component::Part(stuff) => stuff.to_string(),
+            Component::Chapter(stuff) => stuff.to_string(),
+            Component::Section(stuff) => stuff.to_string(),
+            Component::Frame(stuff) => stuff.to_string(),
+            Component::Block(stuff) => stuff.to_string(),
+            Component::Paragraph(stuff) => stuff.to_string(),
+            Component::Line(stuff) => stuff.to_string(),
+            Component::Input(stuff) => stuff.to_string(),
+            Component::Environment(stuff) => stuff.to_string(),
+            Component::List(stuff) => stuff.to_string(),
+            Component::TextChunk(stuff) => stuff.to_string(),
+            Component::Command(stuff) => stuff.to_string(),
+            Component::Subsection(stuff) => stuff.to_string(),
+            Component::Image(stuff) => stuff.to_string(),
+            Component::Row(stuff) => stuff.to_string(),
+            Component::Table(stuff) => stuff.to_string(),
+            Component::Builtin(stuff) => stuff.to_string(),
+            Component::Figure(stuff) => stuff.to_string(),
+            Component::Label(stuff) => stuff.to_string(),
+            Component::Reference(stuff) => stuff.to_string(),
+            // #[cfg(feature = "markdown")]
+            // Component::Markdown(stuff) => stuff.to_string(),
         }
     }
 }
@@ -118,68 +125,50 @@ impl Populate for Component {
     fn attach(&mut self, other: Component) -> TexResult<&mut Self> {
         // assert!(self.rank() >= other.rank());
         if self.rank() > other.rank() {
-            return Err(TexError::RankMismatch.into());
+            return Err(TexError::RankMismatch(other.rank(), self.rank()).into());
         }
         match self {
-            Self::Part(stuff) => {
+            Component::Part(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Chapter(stuff) => {
+            Component::Chapter(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Section(stuff) => {
+            Component::Section(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Frame(stuff) => {
+            Component::Frame(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Block(stuff) => {
+            Component::Block(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Subsection(stuff) => {
+            Component::Subsection(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Paragraph(stuff) => {
+            Component::Paragraph(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Line(stuff) => {
+            Component::Line(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Input(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Environment(stuff) => {
+            Component::Environment(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::List(stuff) => {
+            Component::List(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::TextChunk(stuff) => {
+            Component::TextChunk(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Command(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Image(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Row(stuff) => {
+            Component::Row(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Table(stuff) => {
+            Component::Table(stuff) => {
                 stuff.attach(other)?;
             }
-            Self::Builtin(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Figure(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Label(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Reference(_) => {
-                return Err(TexError::TraitUnimplemented.into());
+            _ => {
+                return Err(TexError::TraitUnimplemented(format!("{:?}", &self)).into());
             }
         };
 
@@ -189,71 +178,113 @@ impl Populate for Component {
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
         let q = other.iter().map(|x| x.rank()).max().unwrap();
         if self.rank() > q {
-            dbg!(self.rank());
-            dbg!(q);
+            // dbg!(self.rank());
+            // dbg!(q);
 
-            return Err(TexError::RankMismatch.into());
+            return Err(TexError::RankMismatch(q, self.rank()).into());
         }
         match self {
-            Self::Part(stuff) => {
+            Component::Part(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Chapter(stuff) => {
+            Component::Chapter(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Section(stuff) => {
+            Component::Section(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Frame(stuff) => {
+            Component::Frame(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Block(stuff) => {
+            Component::Block(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Paragraph(stuff) => {
+            Component::Paragraph(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Line(stuff) => {
+            Component::Line(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Input(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Environment(stuff) => {
+            Component::Environment(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::List(stuff) => {
+            Component::List(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::TextChunk(stuff) => {
+            Component::TextChunk(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Command(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Subsection(stuff) => {
+            Component::Subsection(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Image(_) => {
-                return Err(TexError::TraitUnimplemented.into());
-            }
-            Self::Row(stuff) => {
+            Component::Row(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Table(stuff) => {
+            Component::Table(stuff) => {
                 stuff.attach_vec(other)?;
             }
-            Self::Builtin(_) => {
-                return Err(TexError::TraitUnimplemented.into());
+            _ => {
+                return Err(TexError::TraitUnimplemented(format!("{:?}", &self)).into());
             }
-            Self::Figure(_) => {
-                return Err(TexError::TraitUnimplemented.into());
+        };
+
+        Ok(self)
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, mut other: I) -> TexResult<&mut Self> {
+        // let q = other.map(|x| x.rank()).max().unwrap();
+        if other.any(|x| x.rank() < self.rank()) {
+            // dbg!(self.rank());
+            // dbg!(q);
+
+            return Err(TexError::RankMismatch(
+                other.max_by_key(|x| x.rank()).unwrap().rank(),
+                self.rank(),
+            )
+            .into());
+        }
+        match self {
+            Component::Part(stuff) => {
+                stuff.attach_iter(other)?;
             }
-            Self::Label(_) => {
-                return Err(TexError::TraitUnimplemented.into());
+            Component::Chapter(stuff) => {
+                stuff.attach_iter(other)?;
             }
-            Self::Reference(_) => {
-                return Err(TexError::TraitUnimplemented.into());
+            Component::Section(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::Frame(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::Block(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::Paragraph(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::Line(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::Environment(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::List(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::TextChunk(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::Subsection(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::Row(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            Component::Table(stuff) => {
+                stuff.attach_iter(other)?;
+            }
+            _ => {
+                return Err(TexError::TraitUnimplemented(format!("{:?}", &self)).into());
             }
         };
 

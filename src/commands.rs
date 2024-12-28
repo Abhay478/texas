@@ -4,7 +4,12 @@ use crate::prelude::*;
 
 /// Latex macros.
 /// Rudimentary so far, have to embed latex.
-/// Please refer to README for usage.
+/// 
+/// - name: Name of the new latex macro
+/// - nargs: Number of Args
+/// - def: definition of the command.
+/// 
+/// Compiles to \newcommand{\<name>}[<nargs>]{<def>}
 #[derive(Debug, Clone)]
 pub struct Command {
     pub name: String,

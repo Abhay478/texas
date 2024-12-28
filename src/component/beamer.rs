@@ -29,6 +29,12 @@ impl Populate for Block {
         self.components.append(&mut other);
         Ok(self)
     }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        // todo!()
+        self.components.extend(other);
+        Ok(self)
+    }
 }
 
 impl Block {
@@ -82,6 +88,11 @@ impl Populate for Frame {
     }
     fn attach_vec(&mut self, mut other: Vec<Component>) -> TexResult<&mut Self> {
         self.components.append(&mut other);
+        Ok(self)
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.components.extend(other);
         Ok(self)
     }
 }

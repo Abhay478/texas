@@ -89,13 +89,13 @@ impl From<Environment> for Component {
     }
 }
 
-/*  
+/*
 
 
-    Builtin(Builtin),
+Builtin(Builtin),
 
-    Label(Label),
-    Reference(Reference), */
+Label(Label),
+Reference(Reference), */
 
 impl From<Frame> for Component {
     fn from(value: Frame) -> Self {
@@ -142,7 +142,6 @@ impl From<Reference> for Component {
         Component::Reference(value)
     }
 }
-
 
 impl From<&str> for Label {
     fn from(value: &str) -> Self {

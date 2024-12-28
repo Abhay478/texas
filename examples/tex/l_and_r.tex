@@ -1,0 +1,33 @@
+\documentclass[]{amsart}
+\usepackage[]{graphicx}
+\usepackage[]{hyperref}
+
+
+\graphicspath{{.}, {../img}, } 
+\begin{document}
+\title{title}
+\author{author}
+
+
+\maketitle
+
+
+
+\begin{figure}[] 
+ \centering 
+ \includegraphics[]{ss.png} 
+ 
+ \caption{} 
+ \end{figure}  \label{fig:f1} 
+\begin{figure}[] 
+ \centering 
+ \includegraphics[]{ss.png} 
+ 
+ \caption{} 
+ \end{figure}  \label{fig:f2} 
+This is a reference:  ~\ref{fig:f1} 
+ \\
+And so is this:  ~\ref{fig:f2} 
+ \\
+
+\end{document}

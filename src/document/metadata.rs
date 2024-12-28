@@ -53,7 +53,7 @@ impl Metadata {
             author: author.iter().map(|x| x.to_string()).collect(),
             maketitle: true,
             tableofcontents: false,
-            date: true,
+            date: false,
         }
     }
 }

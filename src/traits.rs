@@ -7,6 +7,7 @@ pub trait Populate {
     /// Weird return type for chaining attaches.
     fn attach(&mut self, other: Component) -> TexResult<&mut Self>;
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self>;
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self>;
 }
 
 pub trait Opt {

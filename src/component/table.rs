@@ -19,8 +19,12 @@ impl Populate for Row {
         self.cells.push(other);
         Ok(self)
     }
-    fn attach_vec(&mut self, mut other: Vec<Component>) -> TexResult<&mut Self> {
-        self.cells.append(&mut other);
+    fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.cells.extend(other);
         Ok(self)
     }
 }
@@ -57,8 +61,12 @@ impl Populate for Table {
         self.rows.push(other);
         Ok(self)
     }
-    fn attach_vec(&mut self, mut other: Vec<Component>) -> TexResult<&mut Self> {
-        self.rows.append(&mut other);
+    fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.rows.extend(other);
         Ok(self)
     }
 }

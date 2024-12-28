@@ -33,6 +33,9 @@ pub mod traits;
 
 pub mod label;
 
+// #[cfg(feature = "markdown")]
+// pub mod markdown;
+
 ///
 #[cfg(test)]
 mod tests;
@@ -45,9 +48,29 @@ pub mod prelude {
     pub use crate::label::*;
     pub use crate::traits::*;
 
+    pub fn escape(s: &str, esc: Option<&[char]>) -> String {
+        if esc.is_none() {
+            s.replace("_", "\\_")
+                .replace("^", "\\^")
+                .replace("#", "\\#")
+                .replace("&", "\\&")
+                .replace("%", "\\%")
+                .replace("$", "\\$")
+                .replace("{", "\\{")
+                .replace("}", "\\}")
+        } else {
+            let esc = esc.unwrap();
+            let mut s = s.to_string();
+            for c in esc {
+                s = s.replace(&c.to_string(), &format!("\\{}", c));
+            }
+            s
+        }
+    }
+
     // All the macros, again.
     pub use crate::{
-        builtin, chapter, command, document, environment, frame, image, package, part, row,
-        section, tabular, textchunk, unwrap, reference, label
+        builtin, chapter, command, document, environment, figure, frame, image, label, package,
+        part, reference, row, section, tabular, textchunk, unwrap,
     };
 }

@@ -22,21 +22,25 @@ impl Populate for Part {
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
-        self.components.extend(other.into_iter());
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.components.extend(other);
         Ok(self)
     }
 }
 impl Part {
     pub fn new(name: &str) -> Self {
         Self {
-            name: name.to_string(),
+            name: escape(name, None),
             components: vec![],
         }
     }
 
     pub fn with_components(name: &str, components: Vec<Component>) -> Self {
         Self {
-            name: name.to_string(),
+            name: escape(name, None),
             components,
         }
     }
@@ -64,21 +68,25 @@ impl Populate for Chapter {
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
-        self.components.extend(other.into_iter());
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.components.extend(other);
         Ok(self)
     }
 }
 impl Chapter {
     pub fn new(name: &str) -> Self {
         Self {
-            name: name.to_string(),
+            name: escape(name, None),
             components: vec![],
         }
     }
 
     pub fn with_components(name: &str, components: Vec<Component>) -> Self {
         Self {
-            name: name.to_string(),
+            name: escape(name, None),
             components,
         }
     }
@@ -106,21 +114,27 @@ impl Populate for Section {
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
-        self.components.extend(other.into_iter());
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.components.extend(other);
         Ok(self)
     }
 }
 impl Section {
     pub fn new(name: &str) -> Self {
+        // let name = name.to_string().replace("_", "\\_")
+
         Self {
-            name: name.to_string(),
+            name: escape(name, None),
             components: vec![],
         }
     }
 
     pub fn with_components(name: &str, components: Vec<Component>) -> Self {
         Self {
-            name: name.to_string(),
+            name: escape(name, None),
             components,
         }
     }
@@ -148,21 +162,25 @@ impl Populate for Subsection {
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
-        self.components.extend(other.into_iter());
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.components.extend(other);
         Ok(self)
     }
 }
 impl Subsection {
     pub fn new(name: &str) -> Self {
         Self {
-            name: name.to_string(),
+            name: escape(name, None),
             components: vec![],
         }
     }
 
     pub fn with_components(name: &str, components: Vec<Component>) -> Self {
         Self {
-            name: name.to_string(),
+            name: escape(name, None),
             components,
         }
     }
@@ -189,7 +207,11 @@ impl Populate for Paragraph {
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
-        self.components.extend(other.into_iter());
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.components.extend(other);
         Ok(self)
     }
 }
@@ -228,7 +250,11 @@ impl Populate for Line {
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
-        self.components.extend(other.into_iter());
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.components.extend(other);
         Ok(self)
     }
 }

@@ -30,7 +30,11 @@ impl Populate for Environment {
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
-        self.components.extend(other.into_iter());
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.components.extend(other);
         Ok(self)
     }
 }
@@ -79,7 +83,11 @@ impl Populate for List {
         Ok(self)
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
-        self.items.extend(other.into_iter());
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
+        self.items.extend(other);
         Ok(self)
     }
 }
@@ -132,6 +140,23 @@ pub struct Figure {
     img: Image,
     caption: String,
     opt: Vec<String>,
+}
+
+impl Figure {
+    pub fn new(img: &str, caption: String) -> Self {
+        Self {
+            img: Image::new(img),
+            caption,
+            opt: vec![],
+        }
+    }
+    pub fn from_img(img: Image, caption: String) -> Self {
+        Self {
+            img,
+            caption,
+            opt: vec![],
+        }
+    }
 }
 
 impl AsLatex for Figure {

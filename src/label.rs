@@ -50,17 +50,20 @@ pub enum Reference {
 
 impl AsLatex for Reference {
     fn to_string(&self) -> String {
-        format!("\\ref{{{}}} \n", match &self {
-            Reference::Standard(s) => format!("std:{s}"),
-            Reference::Equation(s) => format!("eq:{s}"),
-            Reference::Table(s) => format!("tab:{s}"),
-            Reference::Figure(s) => format!("fig:{s}"),
-            Reference::Section(s) => format!("sec:{s}"),
-            Reference::Subsection(s) => format!("subsec:{s}"),
-            Reference::Code(s) => format!("lst:{s}"),
-            Reference::Item(s) => format!("itm:{s}"),
-            Reference::Algorithm(s) => format!("alg:{s}"),
-            Reference::Chapter(s) => format!("ch:{s}"),
-        })
+        format!(
+            "~\\ref{{{}}} \n",
+            match &self {
+                Reference::Standard(s) => format!("std:{s}"),
+                Reference::Equation(s) => format!("eq:{s}"),
+                Reference::Table(s) => format!("tab:{s}"),
+                Reference::Figure(s) => format!("fig:{s}"),
+                Reference::Section(s) => format!("sec:{s}"),
+                Reference::Subsection(s) => format!("subsec:{s}"),
+                Reference::Code(s) => format!("lst:{s}"),
+                Reference::Item(s) => format!("itm:{s}"),
+                Reference::Algorithm(s) => format!("alg:{s}"),
+                Reference::Chapter(s) => format!("ch:{s}"),
+            }
+        )
     }
 }

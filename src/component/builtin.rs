@@ -31,6 +31,7 @@ pub enum BuiltinType {
     Min(TextChunk),
     Max(TextChunk),
     Character(String), // As in greek, but also stuff like \infty, etc.
+    Surround(char, TextChunk, char),
 }
 impl Display for BuiltinType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -38,21 +39,23 @@ impl Display for BuiltinType {
             f,
             "{}",
             match self {
-                Self::EnsureMath(s) => format!("\\ensuremath{{{}}}", s.to_string()),
-                Self::Sin(s) => format!("\\sin{{{}}}", s.to_string()),
-                Self::Cos(s) => format!("\\cos{{{}}}", s.to_string()),
-                Self::Tan(s) => format!("\\tan{{{}}}", s.to_string()),
-                Self::Log(s) => format!("\\log{{{}}}", s.to_string()),
-                Self::Ln(s) => format!("\\ln{{{}}}", s.to_string()),
-                Self::Lg(s) => format!("\\lg{{{}}}", s.to_string()),
-                Self::Sum(down, up) =>
+                BuiltinType::EnsureMath(s) => format!("\\ensuremath{{{}}}", s.to_string()),
+                BuiltinType::Sin(s) => format!("\\sin{{{}}}", s.to_string()),
+                BuiltinType::Cos(s) => format!("\\cos{{{}}}", s.to_string()),
+                BuiltinType::Tan(s) => format!("\\tan{{{}}}", s.to_string()),
+                BuiltinType::Log(s) => format!("\\log{{{}}}", s.to_string()),
+                BuiltinType::Ln(s) => format!("\\ln{{{}}}", s.to_string()),
+                BuiltinType::Lg(s) => format!("\\lg{{{}}}", s.to_string()),
+                BuiltinType::Sum(down, up) =>
                     format!("\\sum_{{{}}}^{{{}}}", down.to_string(), up.to_string()),
-                Self::Prod(down, up) =>
+                BuiltinType::Prod(down, up) =>
                     format!("\\prod_{{{}}}^{{{}}}", down.to_string(), up.to_string()),
-                Self::Arg(s) => format!("\\arg{{{}}}", s.to_string()),
-                Self::Min(s) => format!("\\min{{{}}}", s.to_string()),
-                Self::Max(s) => format!("\\max{{{}}}", s.to_string()),
-                Self::Character(s) => format!("\\{}", s),
+                BuiltinType::Arg(s) => format!("\\arg{{{}}}", s.to_string()),
+                BuiltinType::Min(s) => format!("\\min{{{}}}", s.to_string()),
+                BuiltinType::Max(s) => format!("\\max{{{}}}", s.to_string()),
+                BuiltinType::Character(s) => format!("\\{}", s),
+                BuiltinType::Surround(left, content, right) =>
+                    format!("\\left{left} {} \\right{right}", content.to_string()),
             }
         )?;
 

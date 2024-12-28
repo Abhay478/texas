@@ -4,12 +4,18 @@ macro_rules! part {
     ($i:literal) => {
         Component::Part(Part::new($i))
     };
+    ($i:expr) => {
+        Component::Part(Part::new($i))
+    };
 }
 
 /// Sugar for \chapter{} creation
 #[macro_export]
 macro_rules! chapter {
     ($i:literal) => {
+        Component::Chapter(Chapter::new($i))
+    };
+    ($i:expr) => {
         Component::Chapter(Chapter::new($i))
     };
 }
@@ -20,6 +26,23 @@ macro_rules! image {
     ($i:literal) => {
         Component::Image(Image::new($i))
     };
+    ($i:expr) => {
+        Component::Image(Image::new($i))
+    };
+}
+
+#[macro_export]
+macro_rules! figure {
+    ($i:literal, $c:literal) => {
+        Component::Figure(Figure::new($i, $c))
+    };
+    ($i:expr, $c:expr) => {
+        Component::Figure(Figure::new($i, $c))
+    };
+
+    ($i:expr) => {
+        Component::Figure(Figure::new($i, "".to_string()))
+    };
 }
 
 /// Sugar for \section{} creation
@@ -28,12 +51,18 @@ macro_rules! section {
     ($i:literal) => {
         Component::Section(Section::new($i))
     };
+    ($i:expr) => {
+        Component::Section(Section::new($i))
+    };
 }
 
 /// Sugar for environment creation.
 #[macro_export]
 macro_rules! environment {
     ($i:literal) => {
+        Component::Environment(Environment::new($i))
+    };
+    ($i:expr) => {
         Component::Environment(Environment::new($i))
     };
 }
@@ -55,12 +84,18 @@ macro_rules! command {
     ($doc:ident, $cmd:literal, $( $x:expr ),*) => {
         Component::Command($doc.get_command($cmd)?.call(vec![$($x, )*])?)
     };
+    ($doc:ident, $cmd:ident, $( $x:expr ),*) => {
+        Component::Command($doc.get_command($cmd)?.call(vec![$($x, )*])?)
+    };
 }
 
 /// Sugar for document creation
 #[macro_export]
 macro_rules! document {
     ($l:literal) => {
+        Document::new(DocumentClass::new($l))
+    };
+    ($l:expr) => {
         Document::new(DocumentClass::new($l))
     };
 }
@@ -74,6 +109,12 @@ macro_rules! document {
 #[macro_export]
 macro_rules! package {
     ($pkg:literal$(,)? $( $opt:literal ),*) => {{
+        #[allow(unused_mut)]
+        let mut package = Package::new($pkg);
+        $(package.add_option($opt);)*
+        package
+    }};
+    ($pkg:ident$(,)? $( $opt:ident ),*) => {{
         #[allow(unused_mut)]
         let mut package = Package::new($pkg);
         $(package.add_option($opt);)*
@@ -106,6 +147,11 @@ macro_rules! row {
         $(r.attach($item);)*
         r
     }};
+    ( $( $item:expr ),* ) => {{
+        let mut r = Row::new();
+        $(r.attach($item);)*
+        r
+    }};
 }
 
 /// Convenient, I hope?
@@ -114,6 +160,9 @@ macro_rules! textchunk {
     ($txt:expr, $mode:literal) => {{
         let typ = TextType::from($mode);
         Component::TextChunk(TextChunk::new($txt, typ))
+    }};
+    ($txt:expr) => {{
+        Component::TextChunk(TextChunk::new($txt, TextType::Normal))
     }};
 }
 

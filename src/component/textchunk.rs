@@ -1,7 +1,11 @@
 use std::{
-    fs::File,
+    fs::{read_to_string, File},
     io::{self, Read},
 };
+
+// use markdown::mdast::Node;
+// #[cfg(feature = "markdown")]
+// use markdown::{to_mdast, ParseOptions};
 
 use crate::prelude::*;
 
@@ -60,19 +64,23 @@ impl Populate for TextChunk {
             self.body.push_str(&ch.body);
             Ok(self)
         } else {
-            Err(TexError::RankMismatch.into())
+            Err(TexError::RankMismatch(other.rank(), 10).into())
         }
     }
     fn attach_vec(&mut self, other: Vec<Component>) -> TexResult<&mut Self> {
+        self.attach_iter(other.into_iter())
+    }
+
+    fn attach_iter<I: Iterator<Item = Component>>(&mut self, other: I) -> TexResult<&mut Self> {
         for c in other {
             if let Component::TextChunk(ch) = c {
                 self.body.push_str(&ch.body);
             } else {
-                return Err(TexError::RankMismatch.into());
+                return Err(TexError::RankMismatch(c.rank(), 10).into());
             }
         }
+
         Ok(self)
-        // todo!()
     }
 }
 impl TextChunk {
@@ -80,6 +88,12 @@ impl TextChunk {
         Self {
             body: body.to_string(),
             typ,
+        }
+    }
+    pub fn raw(body: &str) -> Self {
+        Self {
+            body: body.to_string(),
+            typ: TextType::Normal,
         }
     }
     pub fn from_file(path: &str) -> Result<Self, io::Error> {
@@ -90,5 +104,17 @@ impl TextChunk {
             body: buf,
             typ: TextType::Normal,
         })
+    }
+    pub fn from_file_formatted(path: &str, typ: TextType, esc: &[char]) -> Result<Self, io::Error> {
+        let mut f = File::open(path)?;
+        let mut buf = "".to_string();
+        f.read_to_string(&mut buf)?;
+        Ok(Self {
+            body: escape(&buf, Some(esc)),
+            typ,
+        })
+    }
+    pub fn set_type(&mut self, typ: TextType) {
+        self.typ = typ;
     }
 }
